@@ -28,6 +28,9 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
+// Changes made from upstream
+// - negated current_speed value
+
 #include "vesc_ackermann/vesc_to_odom.hpp"
 
 #include <cmath>
@@ -98,8 +101,10 @@ void VescToOdom::vescStateCallback(const VescStateStamped::SharedPtr state)
     return;
   }
 
+  // Begin change from upstream
   // convert to engineering units
-  double current_speed = (-state->state.speed - speed_to_erpm_offset_) / speed_to_erpm_gain_;
+  double current_speed = -(-state->state.speed - speed_to_erpm_offset_) / speed_to_erpm_gain_;
+  // End change from upstream
   if (std::fabs(current_speed) < 0.05) {
     current_speed = 0.0;
   }
