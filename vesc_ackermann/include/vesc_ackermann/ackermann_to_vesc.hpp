@@ -51,6 +51,8 @@ private:
   // conversion gain and offset
   double speed_to_erpm_gain_, speed_to_erpm_offset_;
   double steering_to_servo_gain_, steering_to_servo_offset_;
+  double Kp_, Ki_, Kd_;
+  double servo_feedback_, servo_error_sum_, previous_servo_error_;
 
   /** @todo consider also providing an interpolated look-up table conversion */
 
