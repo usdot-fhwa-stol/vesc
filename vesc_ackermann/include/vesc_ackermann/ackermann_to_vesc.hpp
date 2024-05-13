@@ -28,6 +28,9 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
+// Changes from upstream
+// - added gains for PID controller as parameters
+
 #ifndef VESC_ACKERMANN__ACKERMANN_TO_VESC_HPP_
 #define VESC_ACKERMANN__ACKERMANN_TO_VESC_HPP_
 
@@ -51,7 +54,9 @@ private:
   // conversion gain and offset
   double speed_to_erpm_gain_, speed_to_erpm_offset_;
   double steering_to_servo_gain_, steering_to_servo_offset_;
+  // Begin change from upstream
   double Kp_, Ki_, Kd_;
+  // End change from upstream
   double servo_feedback_, servo_error_sum_, previous_servo_error_;
 
   /** @todo consider also providing an interpolated look-up table conversion */

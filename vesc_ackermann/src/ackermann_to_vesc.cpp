@@ -28,6 +28,9 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
+// Changes made from upstream
+// - added PID controller for setting servo command
+
 #include "vesc_ackermann/ackermann_to_vesc.hpp"
 
 #include <cmath>
@@ -54,10 +57,11 @@ AckermannToVesc::AckermannToVesc(const rclcpp::NodeOptions & options)
     declare_parameter<double>("steering_angle_to_servo_gain");
   steering_to_servo_offset_ =
     declare_parameter<double>("steering_angle_to_servo_offset");
+  // Begin changes from upstream
   Kp_ = declare_parameter<double>("Kp");
   Ki_ = declare_parameter<double>("Ki");
   Kd_ = declare_parameter<double>("Kd");
-  
+  // End changes from upstream
 
   // create publishers to vesc electric-RPM (speed) and servo commands
   erpm_pub_ = create_publisher<Float64>("commands/motor/speed", 10);
@@ -76,11 +80,13 @@ void AckermannToVesc::ackermannCmdCallback(const AckermannDriveStamped::SharedPt
 
   // calc steering angle (servo)
   Float64 servo_msg;
+  // Begin changes from upstream
   double servo_target = steering_to_servo_gain_ * cmd->drive.steering_angle + steering_to_servo_offset_;
   double servo_error = servo_target - servo_feedback_;
   servo_msg.data = Kp_ * servo_error + Ki_ * servo_error_sum_ + Kd_ * (servo_error - previous_servo_error_);
   servo_error_sum_ += servo_error;
   previous_servo_error_ = servo_error;
+  // End changes from upstream
 
   // publish
   if (rclcpp::ok()) {
