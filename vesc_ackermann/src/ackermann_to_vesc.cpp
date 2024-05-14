@@ -62,7 +62,7 @@ AckermannToVesc::AckermannToVesc(const rclcpp::NodeOptions & options)
   Ki_ = declare_parameter<double>("Ki");
   Kd_ = declare_parameter<double>("Kd");
   steering_error_sum_ = 0.0;
-  previous_servo_error_ = 0.0;
+  previous_steering_error_ = 0.0;
   steering_feedback_ = 0.0;
   // End changes from upstream
 
@@ -85,11 +85,11 @@ void AckermannToVesc::ackermannCmdCallback(const AckermannDriveStamped::SharedPt
   Float64 servo_msg;
   // Begin changes from upstream
   double steering_error = cmd->drive.steering_angle - steering_feedback_;
-  double steering_cmd = Kp_ * steering_error + Ki_ * steering_error_sum_ + Kd_ * (steering_error - previous_steering_error_)
+  double steering_cmd = Kp_ * steering_error + Ki_ * steering_error_sum_ + Kd_ * (steering_error - previous_steering_error_);
   servo_msg.data = steering_to_servo_gain_ * steering_cmd + steering_to_servo_offset_;
   steering_error_sum_ += steering_error;
   previous_steering_error_ = steering_error;
-  steering_feedback_ = steerind_cmd;
+  steering_feedback_ = steering_cmd;
   // End changes from upstream
 
   // publish
