@@ -56,8 +56,8 @@ private:
   double steering_to_servo_gain_, steering_to_servo_offset_;
   // Begin change from upstream
   double Kp_, Ki_, Kd_;
+  double steering_feedback_, steering_error_sum_, previous_steering_error_;
   // End change from upstream
-  double servo_feedback_, servo_error_sum_, previous_servo_error_;
 
   /** @todo consider also providing an interpolated look-up table conversion */
 
