@@ -55,8 +55,8 @@ private:
   double speed_to_erpm_gain_, speed_to_erpm_offset_;
   double steering_to_servo_gain_, steering_to_servo_offset_;
   // Begin change from upstream
-  double Kp_, Ki_, Kd_;
-  double steering_feedback_, steering_error_sum_, previous_steering_error_;
+  double cutoff_frequency_, Epow_;
+  double steering_feedback_;
   // End change from upstream
 
   /** @todo consider also providing an interpolated look-up table conversion */
