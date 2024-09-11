@@ -62,6 +62,9 @@ AckermannToVesc::AckermannToVesc(const rclcpp::NodeOptions & options)
   // subscribe to ackermann topic
   ackermann_sub_ = create_subscription<AckermannDriveStamped>(
     "ackermann_cmd", 10, std::bind(&AckermannToVesc::ackermannCmdCallback, this, _1));
+
+  AckermannDriveStamped::SharedPtr empty_ackermann = std::make_shared<AckermannDriveStamped>();
+  ackermannCmdCallback(empty_ackermann);
 }
 
 void AckermannToVesc::ackermannCmdCallback(const AckermannDriveStamped::SharedPtr cmd)
