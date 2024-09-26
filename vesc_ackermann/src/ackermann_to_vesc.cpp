@@ -28,6 +28,9 @@
 
 // -*- mode:c++; fill-column: 100; -*-
 
+// Changes made from upstream
+// - added PID controller for setting servo command
+
 #include "vesc_ackermann/ackermann_to_vesc.hpp"
 
 #include <cmath>
@@ -54,6 +57,11 @@ AckermannToVesc::AckermannToVesc(const rclcpp::NodeOptions & options)
     declare_parameter<double>("steering_angle_to_servo_gain");
   steering_to_servo_offset_ =
     declare_parameter<double>("steering_angle_to_servo_offset");
+  // Begin changes from upstream
+  cutoff_frequency_ = declare_parameter<double>("cutoff_frequency");
+  Epow_ = 1 - exp(-1.0/20.0 * 2 * M_PI * cutoff_frequency_);
+  steering_feedback_ = 0.0;
+  // End changes from upstream
 
   // create publishers to vesc electric-RPM (speed) and servo commands
   erpm_pub_ = create_publisher<Float64>("commands/motor/speed", 10);
@@ -68,11 +76,22 @@ void AckermannToVesc::ackermannCmdCallback(const AckermannDriveStamped::SharedPt
 {
   // calc vesc electric RPM (speed)
   Float64 erpm_msg;
-  erpm_msg.data = speed_to_erpm_gain_ * cmd->drive.speed + speed_to_erpm_offset_;
-
+  if (cmd->drive.speed < 0.0) 
+  {
+  	erpm_msg.data = speed_to_erpm_offset_;
+  } 
+  else 
+  {
+  	erpm_msg.data = speed_to_erpm_gain_ * cmd->drive.speed + speed_to_erpm_offset_;
+  }
   // calc steering angle (servo)
   Float64 servo_msg;
-  servo_msg.data = steering_to_servo_gain_ * cmd->drive.steering_angle + steering_to_servo_offset_;
+  // Begin changes from upstream
+  double steering_error = cmd->drive.steering_angle - steering_feedback_;
+  double steering_cmd = steering_feedback_ + (cmd->drive.steering_angle - steering_feedback_) * Epow_;
+  servo_msg.data = steering_to_servo_gain_ * steering_cmd + steering_to_servo_offset_;
+  steering_feedback_ = steering_cmd;
+  // End changes from upstream
 
   // publish
   if (rclcpp::ok()) {
